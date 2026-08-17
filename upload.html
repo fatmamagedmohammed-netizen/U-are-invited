@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Share the night — Mahmoud &amp; Farah</title>
+<meta name="description" content="Upload your photos and videos from the evening on the Nile.">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Mrs+Saint+Delafield&family=Amiri:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1a1f34; --card:rgba(255,255,255,0.045); --card-border:rgba(216,179,112,0.25);
+    --gold:#d8b370; --gold-soft:#c3a06a; --parchment:#f1e7d4; --muted:#b6ab93;
+    --serif:'Cormorant Garamond', Georgia, serif; --script:'Mrs Saint Delafield', cursive;
+    --sans:'Inter', ui-sans-serif, system-ui, sans-serif; --arabic:'Amiri', Georgia, serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html[dir="rtl"] body{ font-family:var(--arabic); text-align:right; }
+  html[dir="rtl"] h1, html[dir="rtl"] .mono{ font-family:var(--arabic); }
+  body{
+    min-height:100vh; background:radial-gradient(ellipse at 50% 20%, #232a47 0%, #171b2e 55%, #10131f 100%);
+    color:var(--parchment); font-family:var(--sans); display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:64px 24px; text-align:center; -webkit-font-smoothing:antialiased;
+  }
+  .icon-badge{
+    width:64px; height:64px; border-radius:50%; border:1px solid rgba(200,168,106,.5); color:var(--gold);
+    display:flex; align-items:center; justify-content:center; margin-bottom:28px;
+  }
+  .icon-badge svg{ width:26px; height:26px; }
+  .eyebrow{ font-family:var(--serif); font-size:.85rem; text-transform:uppercase; letter-spacing:.3em; color:var(--gold-soft); margin-bottom:14px; }
+  h1{ font-family:var(--script); font-size:3.2rem; color:var(--parchment); }
+  html[dir="rtl"] h1{ font-size:2.2rem; }
+  .lede{ margin-top:26px; max-width:440px; color:var(--muted); line-height:1.7; }
+
+  #langToggle{
+    position:fixed; top:16px; inset-inline-end:16px;
+    border:1px solid var(--card-border); background:rgba(20,24,40,.6); color:var(--parchment);
+    font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; padding:9px 16px; border-radius:999px; cursor:pointer;
+  }
+
+  form{ margin-top:40px; width:100%; max-width:420px; display:flex; flex-direction:column; gap:16px; text-align:start; }
+  label{ font-size:.75rem; text-transform:uppercase; letter-spacing:.15em; color:var(--muted); display:block; margin-bottom:8px; }
+  input[type="text"]{
+    width:100%; background:rgba(255,255,255,.04); border:1px solid var(--card-border); border-radius:6px;
+    padding:12px 14px; color:var(--parchment); font-family:var(--sans); font-size:.95rem;
+  }
+  input[type="text"]:focus{ outline:none; border-color:var(--gold); }
+
+  .dropzone{
+    border:1px dashed rgba(200,168,106,.45); border-radius:8px; padding:28px 16px; text-align:center;
+    cursor:pointer; transition:border-color .2s, background .2s; background:rgba(255,255,255,.02);
+  }
+  .dropzone:hover, .dropzone.drag{ border-color:var(--gold); background:rgba(216,179,112,.06); }
+  .dropzone svg{ width:26px; height:26px; color:var(--gold-soft); margin-bottom:10px; }
+  .dropzone p{ color:var(--muted); font-size:.9rem; }
+  .dropzone input{ display:none; }
+
+  #fileList{ display:flex; flex-direction:column; gap:8px; text-align:start; }
+  .file-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    border:1px solid var(--card-border); border-radius:6px; padding:9px 12px; font-size:.82rem;
+  }
+  .file-row .name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+  .file-row .status{ color:var(--muted); flex-shrink:0; }
+  .file-row.done .status{ color:#9fd8a0; }
+  .file-row.error .status{ color:#e39a9a; }
+
+  button.submit{
+    margin-top:6px; display:flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--gold); color:#232741; border:none; border-radius:6px; font-family:var(--serif);
+    font-size:1.05rem; font-weight:500; padding:14px 24px; cursor:pointer; transition:opacity .2s;
+  }
+  button.submit:hover{ opacity:.88; }
+  button.submit:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .notice{
+    margin-top:28px; max-width:420px; border:1px solid var(--card-border); background:var(--card);
+    border-radius:8px; padding:18px 20px; color:var(--muted); font-size:.88rem; line-height:1.6; display:none;
+  }
+  .notice.show{ display:block; }
+  .notice.success{ border-color:rgba(159,216,160,.4); color:#cfe9cf; }
+
+  a.back{
+    margin-top:44px; display:inline-flex; align-items:center; gap:10px; border:1px solid rgba(200,168,106,.5);
+    color:var(--parchment); font-family:var(--serif); font-size:1rem; padding:12px 28px; border-radius:999px;
+    text-decoration:none; transition:background .2s, color .2s;
+  }
+  a.back:hover{ background:var(--gold); color:#232741; }
+</style>
+</head>
+<body>
+<button id="langToggle" type="button">العربية</button>
+
+<span class="icon-badge">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+</span>
+<p class="eyebrow" data-i18n="eyebrow">Share the night</p>
+<h1 data-i18n="names">Mahmoud &amp; Farah</h1>
+<p class="lede" data-i18n="lede">Thank you for helping us keep every memory from our evening on the Nile. Choose your photos or videos below and send them straight to us.</p>
+
+<form id="uploadForm">
+  <div>
+    <label for="guestName" data-i18n="nameLabel">Your name</label>
+    <input type="text" id="guestName" name="guestName" placeholder="Full name" required>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+    <p data-i18n="dropText">Tap to choose photos or videos</p>
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+  </div>
+
+  <div id="fileList"></div>
+
+  <button class="submit" id="submitBtn" type="submit">
+    <span data-i18n="submit">Upload</span>
+  </button>
+</form>
+
+<div class="notice" id="configNotice" data-i18n="configNotice">
+  Uploads aren't connected yet — the couple still needs to finish the one-time Google Drive setup (see the README). Please check back shortly, and thank you for your patience!
+</div>
+<div class="notice" id="resultNotice"></div>
+
+<a class="back" href="index.html">
+  <span data-i18n="back">Back to the invitation</span>
+</a>
+
+<script>
+(function(){
+  "use strict";
+
+  // Paste the Google Apps Script Web App URL from README step 4 between the quotes below.
+  var SCRIPT_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+  var MAX_FILE_MB = 20;
+
+  var dict = {
+    en: {
+      dir:"ltr", switchLang:"العربية", eyebrow:"Share the night", names:"Mahmoud & Farah",
+      lede:"Thank you for helping us keep every memory from our evening on the Nile. Choose your photos or videos below and send them straight to us.",
+      nameLabel:"Your name", dropText:"Tap to choose photos or videos", submit:"Upload",
+      submitting:"Uploading…", back:"Back to the invitation",
+      configNotice:"Uploads aren't connected yet — the couple still needs to finish the one-time Google Drive setup (see the README). Please check back shortly, and thank you for your patience!",
+      needName:"Please tell us your name first.", needFiles:"Please choose at least one photo or video.",
+      tooBig:"is larger than 20MB and was skipped.",
+      allDone:"Thank you! Your photos and videos are on their way to Mahmoud & Farah.",
+      someFailed:"Some files didn't upload — please check your connection and try again.",
+      uploading:"Uploading…", uploaded:"Uploaded", failed:"Failed"
+    },
+    ar: {
+      dir:"rtl", switchLang:"English", eyebrow:"شاركونا الليلة", names:"محمود و فرح",
+      lede:"شكرًا لمساعدتكم في حفظ كل ذكرى من أمسيتنا على النيل. اختاروا صوركم أو مقاطعكم أدناه وأرسلوها إلينا مباشرة.",
+      nameLabel:"اسمك", dropText:"اضغط لاختيار الصور أو الفيديوهات", submit:"رفع",
+      submitting:"جارٍ الرفع…", back:"العودة إلى الدعوة",
+      configNotice:"لم يتم ربط الرفع بعد — يحتاج العروسان لإكمال إعداد Google Drive لمرة واحدة (راجع ملف README). يرجى المحاولة لاحقًا، شكرًا لصبركم!",
+      needName:"يرجى إدخال اسمك أولاً.", needFiles:"يرجى اختيار صورة أو فيديو واحد على الأقل.",
+      tooBig:"أكبر من 20 ميجابايت وتم تخطيه.",
+      allDone:"شكرًا لكم! صوركم ومقاطعكم في طريقها إلى محمود و فرح.",
+      someFailed:"لم يتم رفع بعض الملفات — يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
+      uploading:"جارٍ الرفع…", uploaded:"تم الرفع", failed:"فشل"
+    }
+  };
+  var locale = "en";
+
+  function applyI18n(){
+    var d = dict[locale];
+    document.documentElement.lang = locale;
+    document.documentElement.dir = d.dir;
+    document.querySelectorAll("[data-i18n]").forEach(function(el){
+      var key = el.getAttribute("data-i18n");
+      if (d[key] !== undefined) el.textContent = d[key];
+    });
+    document.getElementById("langToggle").textContent = d.switchLang;
+  }
+  document.getElementById("langToggle").addEventListener("click", function(){
+    locale = locale === "en" ? "ar" : "en";
+    applyI18n();
+  });
+
+  var configured = SCRIPT_URL.indexOf("PASTE_YOUR") === -1 && SCRIPT_URL.trim().length > 0;
+  if (!configured) document.getElementById("configNotice").classList.add("show");
+
+  var dropzone = document.getElementById("dropzone");
+  var fileInput = document.getElementById("fileInput");
+  var fileListEl = document.getElementById("fileList");
+  var form = document.getElementById("uploadForm");
+  var submitBtn = document.getElementById("submitBtn");
+  var resultNotice = document.getElementById("resultNotice");
+  var selectedFiles = [];
+
+  dropzone.addEventListener("click", function(){ fileInput.click(); });
+  ["dragover","dragenter"].forEach(function(evt){
+    dropzone.addEventListener(evt, function(e){ e.preventDefault(); dropzone.classList.add("drag"); });
+  });
+  ["dragleave","drop"].forEach(function(evt){
+    dropzone.addEventListener(evt, function(e){ e.preventDefault(); dropzone.classList.remove("drag"); });
+  });
+  dropzone.addEventListener("drop", function(e){
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener("change", function(){ handleFiles(fileInput.files); });
+
+  function handleFiles(fileListInput){
+    var d = dict[locale];
+    Array.prototype.forEach.call(fileListInput, function(file){
+      if (file.size > MAX_FILE_MB * 1024 * 1024){
+        alert(file.name + " " + d.tooBig);
+        return;
+      }
+      selectedFiles.push(file);
+    });
+    renderFileList();
+  }
+
+  function renderFileList(){
+    fileListEl.innerHTML = "";
+    selectedFiles.forEach(function(file, idx){
+      var row = document.createElement("div");
+      row.className = "file-row";
+      row.id = "file-row-" + idx;
+      row.innerHTML = '<span class="name">' + file.name + '</span><span class="status"></span>';
+      fileListEl.appendChild(row);
+    });
+  }
+
+  function fileToBase64(file){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(){ resolve(reader.result.split(",")[1]); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function uploadOne(file, guestName){
+    return fileToBase64(file).then(function(base64){
+      var payload = JSON.stringify({
+        fileName: file.name,
+        mimeType: file.type || "application/octet-stream",
+        guestName: guestName,
+        base64: base64
+      });
+      // text/plain avoids a CORS preflight, which Apps Script web apps don't handle.
+      return fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain" }, body: payload });
+    });
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var d = dict[locale];
+    var guestName = document.getElementById("guestName").value.trim();
+    resultNotice.classList.remove("show","success");
+
+    if (!guestName){ resultNotice.textContent = d.needName; resultNotice.classList.add("show"); return; }
+    if (!selectedFiles.length){ resultNotice.textContent = d.needFiles; resultNotice.classList.add("show"); return; }
+    if (!configured){ document.getElementById("configNotice").classList.add("show"); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.querySelector("span").textContent = d.submitting;
+
+    var results = selectedFiles.map(function(file, idx){
+      var row = document.getElementById("file-row-" + idx);
+      row.querySelector(".status").textContent = d.uploading;
+      return uploadOne(file, guestName).then(function(){
+        row.classList.add("done");
+        row.querySelector(".status").textContent = d.uploaded;
+        return true;
+      }).catch(function(){
+        row.classList.add("error");
+        row.querySelector(".status").textContent = d.failed;
+        return false;
+      });
+    });
+
+    Promise.all(results).then(function(outcomes){
+      submitBtn.disabled = false;
+      submitBtn.querySelector("span").textContent = d.submit;
+      var allOk = outcomes.every(Boolean);
+      resultNotice.textContent = allOk ? d.allDone : d.someFailed;
+      resultNotice.classList.add("show");
+      if (allOk) resultNotice.classList.add("success");
+      if (allOk){
+        selectedFiles = [];
+        form.reset();
+        setTimeout(renderFileList, 800);
+      }
+    });
+  });
+
+  applyI18n();
+})();
+</script>
+</body>
+</html>
